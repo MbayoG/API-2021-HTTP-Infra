@@ -8,9 +8,11 @@ Mehdi Salhi
 
 ## Marche à suivre
 
-Commencer par créer un dossier docker-images.  
+Commencer par créer un dossier docker-images. 
+
 Ensuite, créer un dossier "apache_php-image" dans le dossier 
-créé précédemment.  
+créé précédemment. 
+
 Pour finir, créer un fichier Dockerfile dans ce dossier.
 
 Ecrire le contenu suivant dans le dockerfile:
@@ -61,3 +63,53 @@ sudo docker run -d -p 8080:80 my-php-app
 Se rendre à l'adresse *localhost:8080*. 
 
 # Etape 2
+## Prérequis
+Installer node.js et npm
+
+## Description
+
+## Marche à suivre
+Au même niveau que le répertoire "apache_php-image" créé à l'étape 1,
+créer un répertoire express-image.
+
+Ensuite, créer un fichier Dockerfile ainsi qu'un répertoire *src*
+dans ce dossier.
+
+Pour choisir l'image de node.js à installer, nous avons chercher sur 
+`node.js.org` la dernière version stable de node. En l'occurence, il 
+s'agissait de la version 16.13.1.
+
+Nous avons donc utilisé une image de la version 16.13.1-alpine.
+
+Créer un *package.json*dans le répertoir *src"
+à l'aide de la commande suivante:
+```
+npm init
+```
+*Noter que les informations renseignée peuvent être choisie selon leur 
+pertinence pour l'utilisateur, ou laisser par défaut*
+
+Afin de générer des utilisateur de manière aléatoire dans notre *package.json*,
+utiliser la commande suivante:
+```
+npm install --save chance
+```
+
+Créer un fichier *index.js*, qui contiendra le script js voulu.
+
+Dans ce fichier, nous avons entré les instructions suivantes:
+```
+var chance = require('chance');
+var chance = new Chance();
+
+console.log("Hello" + chance.gender() + " " + chance.animal());
+```
+
+Ensuite, créer et lancer une image docker en exécutant les 
+commandes suivantes au même niveau que le Dockerfile:
+```
+sudo docker build -t res/express_students .
+sudo docker run res/express_students
+```
+
+## Démo
