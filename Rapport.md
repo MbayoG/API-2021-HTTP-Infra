@@ -3,6 +3,7 @@ Auteurs :
 Guilain Mbayo,
 Mehdi Salhi
 
+# Etape 1
 ## Description
 
 ## Marche à suivre
@@ -58,3 +59,5 @@ sudo docker run -d -p 8080:80 my-php-app
 
 ### Accès au contenu depuis un navigateur
 Se rendre à l'adresse *localhost:8080*. 
+
+# Etape 2
