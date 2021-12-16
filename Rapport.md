@@ -102,7 +102,11 @@ Dans ce fichier, nous avons entré les instructions suivantes:
 var chance = require('chance');
 var chance = new Chance();
 
-console.log("Hello" + chance.gender() + " " + chance.animal());
+if(chance.gender() == "Male") {
+    console.log("Hello Mr " + chance.animal());
+} else{
+    console.log("Hello Mrs " + chance.animal());
+}
 ```
 
 Ensuite, créer et lancer une image docker en exécutant les 
