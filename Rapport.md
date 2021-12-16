@@ -102,10 +102,12 @@ Dans ce fichier, nous avons entré les instructions suivantes:
 var chance = require('chance');
 var chance = new Chance();
 
-if(chance.gender() == "Male") {
-    console.log("Hello Mr " + chance.animal());
-} else{
-    console.log("Hello Mrs " + chance.animal());
+for(var i = 0; i < 10; ++i) {
+    if(chance.gender() == "Male") {
+        console.log("Hello Mr " + chance.animal());
+    } else{
+        console.log("Hello Mrs " + chance.animal());
+    }
 }
 ```
 
