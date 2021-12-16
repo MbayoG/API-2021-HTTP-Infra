@@ -6,6 +6,7 @@ Mehdi Salhi
 ## Description
 
 ## Marche à suivre
+
 Commencer par créer un dossier docker-images.  
 Ensuite, créer un dossier "apache_php-image" dans le dossier 
 créé précédemment.  
@@ -16,6 +17,7 @@ Ecrire le contenu suivant dans le dockerfile:
 FROM php:7.2-apache
 COPY src/ /var/www/html/
 ```
+
 Cela va permettre de créer un container docker à partir de l'image *php:7.2-apache*
 tout en copiant le contenu de notre répertoire *src/* local vers le répertoire
 */var/www/html/* du container docker.
@@ -31,6 +33,7 @@ sudo docker run -d -p 8080:80 my-php-app
 au port 8080 de notre service docker.*
 
 Se connecter à un terminal dans le container que l'on vient d'exécuter:
+
 ```
 sudo docker exec -it my-running-app2 /bin/bash
 ```
