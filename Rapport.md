@@ -108,6 +108,57 @@ if(chance.gender() == "Male") {
     console.log("Hello Mrs " + chance.animal());
 }
 ```
+### Express
+Aller dans le répertoire src/ puis
+```
+npm install --save express
+```
+Modifier le fichier index.js
+
+```
+// Importe le module express                                                                              
+var express = require('express');                                                                         
+var app = new express();                                                                                  
+                                                                                                          
+// execute le code à chaque requête "GET /"                                                               
+app.get('/', function(req, res) {                                                                         
+    res.send("You tried to access /.");                                                                   
+});                                                                                                       
+                                                                                                          
+// execute le code à chaque requête "GET /test"                                 
+                              
+app.get('/test', function(req, res) {                                                                     
+    res.send("You tried to access /test.");                                                               
+});                                                                                                       
+                                                                                                          
+// Met l'application en mode écoute sur le port 3000 et execute la fonction                               
+// "function() à chaque nouvelle connexion                                                                
+app.listen(3000, function() {                                                                             
+    console.log("Accepting HTTP request on port 3000");                                                   
+});     
+```
+
+Puis tester en lancant
+```
+node index.js
+```
+Puis executer la commande suivante depuis un terminal, réaliser une requête 
+"GET / HTTP/1.1" et  "GET /test HTTP/1.1" et observer le résultat coté serveur.
+
+On constate que ce script permet de réaliser un aiguillage en fonction de la 
+requête du client afin de lui renvoyer le contenu désiré.
+
+```
+telnet localhost 3000
+```
+
+
+
+
+
+
+
+
 
 Ensuite, créer et lancer une image docker en exécutant les 
 commandes suivantes au même niveau que le Dockerfile:
