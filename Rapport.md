@@ -185,12 +185,47 @@ telnet localhost 8080
 ```
 
 # Etape 3
+## description
 
-Ensuite, créer et lancer une image docker en exécutant les 
-commandes suivantes au même niveau que le Dockerfile:
+## Marche à suivre
+Commencer par construire et lancer les deux images créées aux 
+étapes 1 et 2 sans les mapper.
+
+Inspecter les deux container afin de récupérer leurs adresses ip respectives.
+Comme nous utilisons un système linux, on peut se connecter aux deux containers
+directement avec la commande telnet en utilisant les adresses ip respectives
+et les ports 80 pour le static et 3000 pour le dynamic.
+
+Créer un dossier nommé "docker-images" et créer un fichier Dockerfile à l'intérieur.
+Dans le Dockerfile, écrire:
 ```
-sudo docker build -t res/express_students .
-sudo docker run res/express_students
+FROM php:7.2-apache
+COPY conf/ /etc/apache2
+
+RUN a2enmod proxy proxy_http
+RUN a2ensite 000-* 001-*
 ```
+
+Créer un dossier nommé "conf". Dans ce dossier, créer un dossier nommé
+site-available.
+Dans ce dernier dossier, créer deux fichier nommés respectivement 
+"000-default.conf" et "001-reverse-proxy.conf".
+
+Dans le fichier "001-reverse-proxy.conf", écrire:
+```
+
+```
+Dans le fichier "000-default.conf", simplement écrire:
+```
+
+```
+
+On peut ensuite construire et lancer notre nouvelle image en mapant le port
+8080 au port 80 du container. Cela permet de s'y connecter et d'exécuter des 
+requêtes (avec telnet par exemple). On peut constater que les deux fichier
+".conf" créés précédemment fonctionne, car le reverse proxy séléctionne bien
+soit la configuration par défaut, qui renvoie un message d'erreur, soit 
+la configuration "reverse-proxy" qui va nous rediriger sur l'un ou l'autre de
+nos container non mappés.
 
 ## Démo
