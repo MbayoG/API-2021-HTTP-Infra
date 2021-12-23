@@ -154,13 +154,37 @@ requête du client afin de lui renvoyer le contenu désiré.
 telnet localhost 3000
 ```
 
+On peut construire l'image docker, la lancer, puis inspecter son 
+adresse ip à l'aide des commandes suivantes
+```
+sudo docker build -t api/express .
 
+sudo docker run -d --name express_dynamic api/express
 
+sudo docker inspect express_dynamic | grep IPAddress
+```
 
+On peut ensuite se connecter au container docker à l'aidede telnet et
+de l'adresse ip récupérée au point précédent et le port renseigner dans le
+fichier "index.js":
+```
+telnet 172.17.0.2 3000
+```
 
+On peut lancer l'image dans un container docker en mappant le port 8080
+au port 3000 afin de ne pas avoir à passer par l'adresse ip du container.
+Ceci s'effectue avec la commande suivante:
+```
+sudo docker run -p 8080:3000 api/express
+```
 
+Pour obtenir le même comportement que précédemment, il suffit alors d'utiliser
+la commande suivante:
+```
+telnet localhost 8080
+```
 
-
+# Etape 3
 
 Ensuite, créer et lancer une image docker en exécutant les 
 commandes suivantes au même niveau que le Dockerfile:
