@@ -291,6 +291,10 @@ RUN apt-get update && \
     apt-get install -y vim
 ```
 
+Afin de pouvoir nous connecter au reverse proxy sans résoudre de nom DNS,
+nous avons édité notre fichier "001-reverse-proxy.conf" en lui renseignant 
+"localhost" comme nom d'hôte.
+
 Editer le fichier "index.html" créé au point 1 afin d'y rajouter un script
 js juste avant la balise fermante du body.
 ```
