@@ -4,6 +4,8 @@ $(function() {
     function loadAnimals() {
         $.getJSON( "/api/animals/", function( data ) {
             console.log(data);
+            var message = data;
+        $(".mySuperClass").text(message);
         });
     };
 
