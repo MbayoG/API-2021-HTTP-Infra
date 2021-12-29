@@ -243,12 +243,12 @@ nos container non mappés.
 ```
 Depuis le repertoire contenant le Dockerfile du site statique, construire puis 
 lancer l'image
-sudo docker build -t api/static_apache
-sudo docker run -d static_apache
+sudo docker build -t api/static_apache .
+sudo docker run -d api/static_apache
 
 Depuis le repertoire contenant le Dockerfile du site express.js, construire 
 puis lancer l'image
-sudo docker build -t api/express
+sudo docker build -t api/express .
 sudo docker run -d api/express
 
 Récupérer les adresses IP des deux containers lancé précédement:
@@ -282,4 +282,32 @@ Host: revprox
 
 # Etape 4
 
+## Marche à suivre
+
+Mettre à jours le fichier Dockerfile des étapes 1 et 2 afin d'installer
+vim dans chacune de ces deux images. Pour cela, rajouter cette commande:
+```
+RUN apt-get update && \
+    apt-get install -y vim
+```
+
+Afin de pouvoir nous connecter au reverse proxy sans résoudre de nom DNS,
+nous avons édité notre fichier "001-reverse-proxy.conf" en lui renseignant 
+"localhost" comme nom d'hôte.
+
+Editer le fichier "index.html" créé au point 1 afin d'y rajouter un script
+js juste avant la balise fermante du body.
+```
+    ...
+    <!-- Custom script -->
+    <script src="js/....js"></script>
+</body>
+```
+
+Se rendre dans le dossier "js" se trouvant au même niveau que "index.html"
+et y créer un fichier "**tatata**.js". Dans ce fichier, écrire le contenu
+suivant:
+```
+
+```
 
