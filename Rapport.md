@@ -240,4 +240,42 @@ soit la configuration par défaut, qui renvoie un message d'erreur, soit
 la configuration "reverse-proxy" qui va nous rediriger sur l'un ou l'autre de
 nos container non mappés.
 
+```
+Depuis le repertoire contenant le Dockerfile du site statique, construire puis 
+lancer l'image
+sudo docker build -t api/static_apache
+sudo docker run -d static_apache
+
+Depuis le repertoire contenant le Dockerfile du site express.js, construire 
+puis lancer l'image
+sudo docker build -t api/express
+sudo docker run -d api/express
+
+Récupérer les adresses IP des deux containers lancé précédement:
+Obtenir le nom des contrainers lancés
+sudo docker ps
+
+Inspecter les deux containers
+sudo docker inspect <nom_container_lancé> | grep IPAddress
+
+Puis mettre les adresses IP respective dans le fichier 001-reverse-proxy.conf
+pour effectuer les bonnes redirections
+
+Depuis le repertoire contenant le Dockerfile le reverse proxy, construire 
+puis lancer l'image
+sudo docker build -t api/reverse_proxy_apache .
+sudo docker run -d -p 8080:80 api/reverse_proxy_apache
+Puis se connecter au serveur:
+telnet localhost 8080
+Et entrer:
+GET / HTTP/1.1
+Host: revprox
+
+Puis constater la redirection vers le site bootstrap
+Réeffectuer une connexion pour tester la redirection vers le site express.js
+telnel localhost 8080
+Et entrer:
+GET /api/animals/HTTP/1.1
+Host: revprox
+```
 ## Démo
