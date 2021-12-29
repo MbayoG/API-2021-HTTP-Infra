@@ -27,7 +27,8 @@ app.listen(3000, function() {
 
 // Fonction qui génère une String sous forme de liste d'animaux
 function generateAnimals() {
-    var animalsList = "Welcome to HEIG, these animals are currently enrolled at our school: \n";
+    var animals = [];
+    //var animalsList = "Welcome to HEIG, these animals are currently enrolled at our school: \n";
     var numberOfAnimals = chance.integer({
         min: 5,
         max: 10
@@ -43,8 +44,16 @@ function generateAnimals() {
         var firstName = chance.first({ gender: gender });
         var lastName = chance.last();
         var word = randomWords.generateSlug(4, {format: "title" });
-        animalsList += (gender == "Male" ? "Mr. " : "Mrs. ") + firstName + " " + lastName + ", " + species + ", born on " + birthYear + ", Favourite words: " + word + "\n";
+
+        animals.push({
+            firstname: firstName,
+            lastname: lastName,
+            gend: gender,
+            specie: species,
+            birthyear: birthYear,
+            favouriteWords: word
+        });
     };
-    console.log(animalsList);
-    return animalsList;
+    console.log(animals);
+    return animals;
 }
