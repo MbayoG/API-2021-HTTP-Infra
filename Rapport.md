@@ -243,12 +243,12 @@ nos container non mappés.
 ```
 Depuis le repertoire contenant le Dockerfile du site statique, construire puis 
 lancer l'image
-sudo docker build -t api/static_apache
-sudo docker run -d static_apache
+sudo docker build -t api/static_apache .
+sudo docker run -d api/static_apache
 
 Depuis le repertoire contenant le Dockerfile du site express.js, construire 
 puis lancer l'image
-sudo docker build -t api/express
+sudo docker build -t api/express .
 sudo docker run -d api/express
 
 Récupérer les adresses IP des deux containers lancé précédement:
