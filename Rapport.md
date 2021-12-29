@@ -213,11 +213,23 @@ Dans ce dernier dossier, créer deux fichier nommés respectivement
 
 Dans le fichier "001-reverse-proxy.conf", écrire:
 ```
+<VirtualHost *:80>
+    ServerName revprox
 
+    ProxyPass "/api/animals/" "http://172.17.0.2:3000/"
+    ProxyPassReverse "/api/animals/" "http://172.17.0.2:3000/"
+
+
+    ProxyPass "/" "http://172.17.0.3:80/"
+    ProxyPassReverse "/" "http://172.17.0.3:80/"
+
+</VirtualHost>
 ```
 Dans le fichier "000-default.conf", simplement écrire:
-```
 
+```
+<VirtualHost *:80>
+</VirtualHost>
 ```
 
 On peut ensuite construire et lancer notre nouvelle image en mapant le port
