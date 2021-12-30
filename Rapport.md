@@ -461,3 +461,9 @@ Rajouter cette ligne dans dans le fichier "apache2-foreground":
 ```
 php /var/apache2/templates/config-template.php > /etc/apache2/sites-available/001-reverse-proxy.conf
 ```
+
+Procédure:
+```
+sudo docker run -d -e STATIC_APP=172.17.0.2:80 -e DYNAMIC_APP=172.17.0.3:3000 -p
+ 8080:80 api/dynrp
+```
