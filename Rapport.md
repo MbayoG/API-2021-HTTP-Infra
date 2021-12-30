@@ -291,23 +291,79 @@ RUN apt-get update && \
     apt-get install -y vim
 ```
 
+Note:
 Afin de pouvoir nous connecter au reverse proxy sans résoudre de nom DNS,
 nous avons édité notre fichier "001-reverse-proxy.conf" en lui renseignant 
 "localhost" comme nom d'hôte.
 
 Editer le fichier "index.html" créé au point 1 afin d'y rajouter un script
-js juste avant la balise fermante du body.
+js juste avant la balise fermante du body, ainsi que la librairie jquery.
 ```
-    ...
-    <!-- Custom script -->
-    <script src="js/....js"></script>
+    <!-- jQuery -->
+        <script
+            src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+            
+        <!-- Custom script to load animals-->
+        <script src="js/animals.js"></script>
 </body>
 ```
 
 Se rendre dans le dossier "js" se trouvant au même niveau que "index.html"
-et y créer un fichier "**tatata**.js". Dans ce fichier, écrire le contenu
+et y créer un fichier "**animals**.js". Dans ce fichier, écrire le contenu
 suivant:
+``` 
+/*
+    API - Labo HTTP Infrastructure
+    Authors: Guilain Mbayo, Mehdi Salhi
+    Date: 30.12.2021
+    Description: JS script that uses jquery to send a query to our node.js
+     server and gets a JSON object and then updates the content of our page
+      with it every 5 seconds.
+ */
+$(function() {
+    console.log("Loading animals");
+    
+    function loadAnimals() {
+        
+            $.getJSON( '/api/animals/', function( animals ) {
+                        console.log(animals);
+                        var message = animals[0].firstname + " " +
+                            animals[0].lastname + ", " +
+                            animals[0].gend + ", " +
+                            animals[0].specie + ", born in " +
+                            animals[0].birthyear + ", favourite words: " +
+                            animals[0].favouriteWords;
+
+                    $(".mySuperClass").html(message);
+                    });
+    };
+
+    loadAnimals();
+    setInterval(loadAnimals, 5000);
+});
 ```
 
+La ligne **$(".mySuperClass").html(message);** permet de mettre à jour 
+les éléments qui font partie de la classe "**mySuperClass**".
+
+Construire et lancer les containers Docker
+```
+Depuis les repertoires associés aux containers voulus:
+sudo docker build -t api/ajax .
+sudo docker build -t api/express .
+sudo docker build -t api/rp .
+
+Puis lancer les containers:
+sudo docker run -d api/ajax
+sudo docker run -d api/express
+sudo docker run -d -p 8080:80 api/rp
+
+Puis accéder au reverse proxy depuis un navigateur avec l'adresse 
+localhost:8080 et constater la page se mettre à jour toutes les 5 secondes.
 ```
 
+Résultat: 
+
+![img.png](figures/img.png)
+
+![img_1.png](figures/img_1.png)
