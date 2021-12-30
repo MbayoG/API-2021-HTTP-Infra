@@ -367,3 +367,8 @@ Résultat:
 ![img.png](figures/img.png)
 
 ![img_1.png](figures/img_1.png)
+
+### Sans proxy
+Notre démo ne fonctionnerait pas sans un reverse proxy à cause du mécanisme 
+de sécurité "same-origin" qui empêche de charger des scripts qui ne 
+proviennent pas de la même origine que la page.
