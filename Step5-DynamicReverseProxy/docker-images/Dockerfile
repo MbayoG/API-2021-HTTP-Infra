@@ -3,6 +3,7 @@ COPY conf/ /etc/apache2
 
 COPY apache2-foreground /usr/local/bin/
 RUN chmod +x /usr/local/bin/apache2-foreground
+COPY templates /var/apache2/templates
 
 RUN apt update && apt install -y vim
 
