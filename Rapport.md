@@ -459,5 +459,5 @@ suivant:
 
 Rajouter cette ligne dans dans le fichier "apache2-foreground":
 ```
-php /var/apache2/templates/config-template.php >
+php /var/apache2/templates/config-template.php > /etc/apache2/sites-available/001-reverse-proxy.conf
 ```
