@@ -470,3 +470,47 @@ sudo docker run -d -e STATIC_APP=172.17.0.2:80 -e DYNAMIC_APP=172.17.0.3:3000 -p
 
 # Step 6 - Load Balancer
 
+## Marche à suivre
+Nous avons décidé de ne pas implémenter les adresses ip dynamique pour
+cette étape, car nous lançons plusieurs containers et ne voulons pas devoir
+passer 5 ou plus adresses ip en paramètre à chaque fois.
+
+Afin de mettre en place le load balancing, il suffit de définir des 
+"proxy balancer" dans le fichier "001-reverse-proxy.conf" afin de 
+renseigner les différent serveurs disponible au balancing pour une url.
+```
+<VirtualHost *:80>
+    ServerName localhost
+
+    <Proxy "balancer://dynamic">
+        BalancerMember "http://172.17.0.2:3000"
+        BalancerMember "http://172.17.0.3:3000"
+        ProxySet lbmethod=byrequests
+    </Proxy>
+
+    ProxyPass        "/api/animals/" "balancer://dynamic/"
+    ProxyPassReverse "/api/animals/" "balancer://dynamic/"
+
+    <Proxy "balancer://static">
+        BalancerMember "http://172.17.0.4:80/"
+        BalancerMember "http://172.17.0.5:80/"
+        ProxySet lbmethod=byrequests
+    </Proxy>
+
+    ProxyPass        "/" "balancer://static/"
+    ProxyPassReverse "/" "balancer://static/"
+
+</VirtualHost>
+```
+
+Les adresses ip sont évidemment à changer en fonction de la configuration
+des différents containers.
+
+En lançant tous les serveurs et en vérifiant les logs des deux serveurs
+dynamics, on voit qu'ils répondent tous deux à des requêtes.
+```
+sudo docker logs <nom_container>
+```
+On peut aussi arrêter l'un des serveurs de chaque groupe et voir 
+que le site est toujours affiché et que les requêtes dynamiques 
+continue à recevoir des réponses.
