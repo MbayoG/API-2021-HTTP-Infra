@@ -517,3 +517,43 @@ continue à recevoir des réponses.
 
 # Etape 7 - round-robin vs sticky sessions
 ## Marche à suivre
+Tout d'abord, il faut ajouter le module "headers" au modules chargé dans le
+Dockerfile du reverse proxy.
+```
+RUN a2enmod proxy proxy_http proxy_balancer lbmethod_byrequests headers
+```
+
+Ensuite, il faut modifier le fichier "001-reverse-proxy.conf" afin 
+rajouter un header permettant de créer un cookie référençant un des serveurs.
+Le cookie est ensuite utilisé pour effectuer toutes les requêtes d'une
+session sur le même serveur.
+```
+<VirtualHost *:80>
+    ServerName localhost
+
+    Header add Set-Cookie "ROUTEID=.%{BALANCER_WORKER_ROUTE}e; path=/" env=BALANCER_ROUTE_CHANGED
+
+    <Proxy "balancer://dynamic">
+        BalancerMember "http://172.17.0.4:3000"
+        BalancerMember "http://172.17.0.3:3000"
+    </Proxy>
+
+    ProxyPass        "/api/animals/" "balancer://dynamic"
+    ProxyPassReverse "/api/animals/" "balancer://dynamic"
+
+    <Proxy "balancer://static">
+        BalancerMember "http://172.17.0.2:80/" route=1
+        BalancerMember "http://172.17.0.5:80/" route=2
+        ProxySet stickysession=ROUTEID
+    </Proxy>
+
+    ProxyPass        "/" "balancer://static/"
+    ProxyPassReverse "/" "balancer://static/"
+
+
+</VirtualHost>
+```
+
+Pour tester le bon fonctionnement de la procédure, nous avons vérifier 
+les cookies dans le navigateur ainsi que regardé les logs de nos containers
+afin de savoir quel serveur répondait à quel moment.
