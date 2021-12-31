@@ -468,7 +468,7 @@ sudo docker run -d -e STATIC_APP=172.17.0.2:80 -e DYNAMIC_APP=172.17.0.3:3000 -p
  8080:80 api/dynrp
 ```
 
-# Step 6 - Load Balancer
+# Etape 6 - Load Balancer
 
 ## Marche à suivre
 Nous avons décidé de ne pas implémenter les adresses ip dynamique pour
@@ -514,3 +514,6 @@ sudo docker logs <nom_container>
 On peut aussi arrêter l'un des serveurs de chaque groupe et voir 
 que le site est toujours affiché et que les requêtes dynamiques 
 continue à recevoir des réponses.
+
+# Etape 7 - round-robin vs sticky sessions
+## Marche à suivre
