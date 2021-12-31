@@ -11,6 +11,7 @@ var randomWords = require('random-word-slugs');
 
 // execute le code à chaque requête "GET /"
 app.get('/', function(req, res) {
+    console.log("GET / received");
     res.send(generateAnimals());
 });
 
