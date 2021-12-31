@@ -517,13 +517,13 @@ continue à recevoir des réponses.
 
 # Etape 7 - round-robin vs sticky sessions
 ## Marche à suivre
-Tout d'abord, il faut ajouter le module "headers" au modules chargé dans le
+Tout d'abord, il faut ajouter le module "headers" aux modules chargés dans le
 Dockerfile du reverse proxy.
 ```
 RUN a2enmod proxy proxy_http proxy_balancer lbmethod_byrequests headers
 ```
 
-Ensuite, il faut modifier le fichier "001-reverse-proxy.conf" afin 
+Ensuite, il faut modifier le fichier "001-reverse-proxy.conf" afin de 
 rajouter un header permettant de créer un cookie référençant un des serveurs.
 Le cookie est ensuite utilisé pour effectuer toutes les requêtes d'une
 session sur le même serveur.
@@ -554,6 +554,14 @@ session sur le même serveur.
 </VirtualHost>
 ```
 
-Pour tester le bon fonctionnement de la procédure, nous avons vérifier 
+Pour tester le bon fonctionnement de la procédure, nous avons vérifié
 les cookies dans le navigateur ainsi que regardé les logs de nos containers
-afin de savoir quel serveur répondait à quel moment.
+afin de savoir quel serveur répondait à quel moment. Nous pouvons confirmer que 
+les sticky sessions sont correctement implémentées car en vérifiant les logs 
+des serveurs, nous constatons que c'est toujours le même serveur qui réponds aux 
+requêtes pour la même session. Du coté client, nous pouvons confirmer que les 
+cookies sont correctement créés avec un paramètre ROUTEID comme le montre la 
+capture d'écran ci-dessous de deux navigateurs différents qui obtient un 
+ROUTEID différent.
+
+![](figures/sticky.jpg)
