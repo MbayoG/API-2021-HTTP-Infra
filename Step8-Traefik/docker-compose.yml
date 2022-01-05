@@ -1,7 +1,5 @@
 version: '3'
 
-
-
 services:
 
   reverse-proxy:
@@ -20,16 +18,13 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
     environment:
-      # - TRAEFIK_LOG_LEVEL=DEBUG
       - TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
       - TRAEFIK_PROVIDERS_DOCKER=true
-      # - TRAEFIK_API_INSECURE=true
       - TRAEFIK_ENTRYPOINTS_FRONT=true
       - TRAEFIK_ENTRYPOINTS_FRONT_ADDRESS=:${FRONT_HTTP_PORT:-80}
 
   ajax:
-    # A container that exposes an API to show its IP address
-
+    # Static Content
     image: api/ajax
     deploy:
       replicas: 2
@@ -38,7 +33,7 @@ services:
      - "traefik.http.routers.ajax.rule=PathPrefix(`/`)"
 
   express:
-    # A container that exposes an API to show its IP address
+    # Dynamic Content
     image: api/express
     deploy:
       replicas: 2

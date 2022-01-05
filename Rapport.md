@@ -571,5 +571,11 @@ ROUTEID différent.
 
 ## Avec traefik
 
-# Etape 8 - Dynamic cluster management
+# Etape 8 Management UI - Load Balancing, Dynamic cluster management & Management Ui
+## Description
+Implémenter une solution avec load balancing et gestion dynamique de 
+cluster ou les noeuds peuvent apparaître et disparaître et redevenir 
+accessibles automatiquement, le tout pouvant être surveillé et géré depuis 
+une interface web.
+
 ## Marche à suivre
