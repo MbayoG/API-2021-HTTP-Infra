@@ -578,4 +578,73 @@ cluster ou les noeuds peuvent apparaître et disparaître et redevenir
 accessibles automatiquement, le tout pouvant être surveillé et géré depuis 
 une interface web.
 
+## Implémentation
+Nous avons utilisé Docker-Compose, Traefik et Portainer pour implémenter cette 
+solution. Docker-compose nous permet de configurer tous nos containers dans 
+un fichier et de les lancer. Traefik permet de gérer le load-balancing et 
+Portainer permet de gérer les containers depuis une interface web.
+
 ## Marche à suivre
+
+Créer un fichier docker-compose.yml
+```
+version: '3'
+services:
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.5
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --api.insecure=true --providers.docker
+    ports:
+      # The HTTP port
+      #- "8282:80"
+      - "${FRONT_HTTP_PORT:-8282}:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    environment:
+      - TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
+      - TRAEFIK_PROVIDERS_DOCKER=true
+      - TRAEFIK_ENTRYPOINTS_FRONT=true
+      - TRAEFIK_ENTRYPOINTS_FRONT_ADDRESS=:${FRONT_HTTP_PORT:-80}
+
+  ajax:
+    # Static Content
+    build: ../Step4-AjaxJQery/docker-images/ajax-query/.
+    image: api/ajax
+    deploy:
+      replicas: 2
+    labels:
+     - "traefik.enable=true"
+     - "traefik.http.routers.ajax.rule=PathPrefix(`/`)"
+
+  express:
+    # Dynamic Content
+    build: ../Step2-Dynamic-HTTP/docker-images/express-image/.
+    image: api/express
+    deploy:
+      replicas: 2
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.express.loadbalancer.server.port=3000"
+      - "traefik.http.routers.express.rule=PathPrefix(`/api/animals/`)"
+      - "traefik.http.routers.express.middlewares=express-replacepath"
+      - "traefik.http.middlewares.express-replacepath.replacepath.path=/"
+
+  portainer:
+    # Portainer management UIdocker-images/ajax-query/.
+    image: portainer/portainer-ce
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+```
+
+Puis lancer les containers avec la commande
+
+```
+sudo docker-compose --compatibility up -d
+```

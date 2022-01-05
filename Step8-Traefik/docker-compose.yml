@@ -1,7 +1,5 @@
 version: '3'
-
 services:
-
   reverse-proxy:
     # The official v2 Traefik docker image
     image: traefik:v2.5
@@ -47,7 +45,7 @@ services:
       - "traefik.http.middlewares.express-replacepath.replacepath.path=/"
 
   portainer:
-    # Portainer management UI
+    # Portainer management UIdocker-images/ajax-query/.
     image: portainer/portainer-ce
     ports:
       - "9000:9000"
