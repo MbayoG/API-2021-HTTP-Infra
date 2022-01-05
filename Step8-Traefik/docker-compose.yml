@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.5
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --api.insecure=true --providers.docker
+    ports:
+      # The HTTP port
+      - "8282:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+  ajax:
+    # A container that exposes an API to show its IP address
+    image: api/ajax
+    labels:
+      - "traefik.http.routers.ajax.rule=Host(`ajax.docker.localhost`)"
+
+  express:
+    # A container that exposes an API to show its IP address
+    image: api/express
+    labels:
+      - "traefik.http.routers.express.rule=Host(`express.docker.localhost`)"
+      - "traefik.http.services.express.loadbalancer.server.port=3000"

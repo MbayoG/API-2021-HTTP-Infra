@@ -8,3 +8,13 @@ providers:
 # API and dashboard configuration
 api:
   insecure: true
+
+services:
+  ajax:
+    image: "api/ajax"
+    container_name: "api/ajax"
+    hostname: "ajax"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ajax.entrypoints=web"
+      - "traefik.http.routers.ajax.rule=Host(`ajax.$MY_DOMAIN`)"
