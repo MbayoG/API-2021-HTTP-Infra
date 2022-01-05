@@ -25,6 +25,7 @@ services:
 
   ajax:
     # Static Content
+    build: ../Step4-AjaxJQery/docker-images/ajax-query/.
     image: api/ajax
     deploy:
       replicas: 2
@@ -34,6 +35,7 @@ services:
 
   express:
     # Dynamic Content
+    build: ../Step2-Dynamic-HTTP/docker-images/express-image/.
     image: api/express
     deploy:
       replicas: 2
@@ -43,3 +45,11 @@ services:
       - "traefik.http.routers.express.rule=PathPrefix(`/api/animals/`)"
       - "traefik.http.routers.express.middlewares=express-replacepath"
       - "traefik.http.middlewares.express-replacepath.replacepath.path=/"
+
+  portainer:
+    # Portainer management UI
+    image: portainer/portainer-ce
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
