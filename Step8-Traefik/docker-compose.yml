@@ -17,12 +17,16 @@ services:
   ajax:
     # A container that exposes an API to show its IP address
     image: api/ajax
+    deploy:
+      replicas: 2
     labels:
       - "traefik.http.routers.ajax.rule=Host(`ajax.docker.localhost`)"
 
   express:
     # A container that exposes an API to show its IP address
     image: api/express
+    deploy:
+      replicas: 2
     labels:
       - "traefik.http.routers.express.rule=Host(`express.docker.localhost`)"
       - "traefik.http.services.express.loadbalancer.server.port=3000"
