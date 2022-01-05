@@ -515,6 +515,9 @@ On peut aussi arrêter l'un des serveurs de chaque groupe et voir
 que le site est toujours affiché et que les requêtes dynamiques 
 continue à recevoir des réponses.
 
+## Avec traefik
+
+
 # Etape 7 - round-robin vs sticky sessions
 ## Marche à suivre
 Tout d'abord, il faut ajouter le module "headers" aux modules chargés dans le
@@ -565,3 +568,8 @@ capture d'écran ci-dessous de deux navigateurs différents qui obtient un
 ROUTEID différent.
 
 ![](figures/sticky.jpg)
+
+## Avec traefik
+
+# Etape 8 - Dynamic cluster management
+## Marche à suivre
