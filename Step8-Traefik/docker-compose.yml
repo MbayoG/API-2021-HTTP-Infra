@@ -1,6 +1,9 @@
 version: '3'
 
+
+
 services:
+
   reverse-proxy:
     # The official v2 Traefik docker image
     image: traefik:v2.5
@@ -8,19 +11,31 @@ services:
     command: --api.insecure=true --providers.docker
     ports:
       # The HTTP port
-      - "8282:80"
+      #- "8282:80"
+      - "${FRONT_HTTP_PORT:-8282}:80"
       # The Web UI (enabled by --api.insecure=true)
       - "8080:8080"
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
+
+    environment:
+      # - TRAEFIK_LOG_LEVEL=DEBUG
+      - TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
+      - TRAEFIK_PROVIDERS_DOCKER=true
+      # - TRAEFIK_API_INSECURE=true
+      - TRAEFIK_ENTRYPOINTS_FRONT=true
+      - TRAEFIK_ENTRYPOINTS_FRONT_ADDRESS=:${FRONT_HTTP_PORT:-80}
+
   ajax:
     # A container that exposes an API to show its IP address
+
     image: api/ajax
     deploy:
       replicas: 2
     labels:
-      - "traefik.http.routers.ajax.rule=Host(`ajax.docker.localhost`)"
+     - "traefik.enable=true"
+     - "traefik.http.routers.ajax.rule=PathPrefix(`/`)"
 
   express:
     # A container that exposes an API to show its IP address
@@ -28,5 +43,8 @@ services:
     deploy:
       replicas: 2
     labels:
-      - "traefik.http.routers.express.rule=Host(`express.docker.localhost`)"
+      - "traefik.enable=true"
       - "traefik.http.services.express.loadbalancer.server.port=3000"
+      - "traefik.http.routers.express.rule=PathPrefix(`/api/animals/`)"
+      - "traefik.http.routers.express.middlewares=express-replacepath"
+      - "traefik.http.middlewares.express-replacepath.replacepath.path=/"
