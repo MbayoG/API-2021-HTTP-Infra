@@ -40,10 +40,10 @@ Se connecter à un terminal dans le container que l'on vient d'exécuter:
 sudo docker exec -it my-running-app2 /bin/bash
 ```
 On peut ensuite explorer l'arborescence à l'aide des commandes
-classic (ls, cd, etc...)
+classique (ls, cd, etc, ...)
 
 Créer un fichier "index.html" dans le répertoire src créé précédemment. Ce
-fichier servira de page d'accueil pour notre serveur http apache.
+fichier servira de page d'accueil pour notre serveur http Apache.
 Dans notre cas, nous avons inclus un modèle bootstrap déjà fait afin d'avoir une
 présentation plus élégante qu'un simple titre sur fond blanc.
 
@@ -66,22 +66,31 @@ Se rendre à l'adresse *localhost:8080*.
 Installer node.js et npm
 
 ## Description
-Implémenter un serveur HTTP avec servant du contenu dynamique et aléatoire 
+Implémenter un serveur HTTP servant du contenu dynamique et aléatoire 
 avec express.js
+
+## Implémentation
+Notre implémentation génère un objet JSON avec du contenu aléatoire avec des 
+prénoms, noms, espèces, années de naissance et mots favoris à chaque requête 
+"GET /" faite sur le port 3000.
+
+Exemple : 
+
+![](figures/json.png)
 
 ## Marche à suivre
 
 Créer un fichier Dockerfile ainsi qu'un répertoire *src*
 dans ce dossier.
 
-Pour choisir l'image de node.js à installer, nous avons chercher sur 
-`node.js.org` la dernière version stable de node. En l'occurence, il 
+Pour choisir l'image de node.js à installer, nous avons cherché sur 
+`node.js.org` la dernière version stable de node. En l'occurrence, il 
 s'agissait de la version 16.13.1.
 
 Nous avons donc utilisé une image de la version 16.13.1-alpine.
 
-Créer un *package.json*dans le répertoir *src"
-à l'aide de la commande suivante:
+Créer un *package.json*dans le répertoire *src"
+à l'aide de la commande suivante :
 ```
 npm init
 ```
@@ -89,14 +98,15 @@ npm init
 pertinence pour l'utilisateur ou être laissées par défaut*
 
 Afin de générer du contenu aléatoire, nous avons installé le module chance 
-avec la commande suivante :
+ainsi que random-word-slugs avec les commandes suivantes :
 ```
 npm install --save chance
+npm install --save random-word-slugs
 ```
 
 Créer un fichier *index.js*, qui contiendra le script js voulu.
 
-Dans ce fichier, nous avons entré les instructions suivantes:
+Dans ce fichier, nous avons entré les instructions suivantes :
 ```
 var chance = require('chance');
 var chance = new Chance();
@@ -108,6 +118,7 @@ for(var i = 0; i < 10; ++i) {
         console.log("Hello Mrs " + chance.animal());
     }
 }
+
 ```
 ### Express
 Aller dans le répertoire src/ puis
@@ -117,26 +128,67 @@ npm install --save express
 Modifier le fichier index.js
 
 ```
-// Importe le module express                                                                              
-var express = require('express');                                                                         
-var app = new express();                                                                                  
-                                                                                                          
-// execute le code à chaque requête "GET /"                                                               
-app.get('/', function(req, res) {                                                                         
-    res.send("You tried to access /.");                                                                   
-});                                                                                                       
-                                                                                                          
-// execute le code à chaque requête "GET /test"                                 
-                              
-app.get('/test', function(req, res) {                                                                     
-    res.send("You tried to access /test.");                                                               
-});                                                                                                       
-                                                                                                          
-// Met l'application en mode écoute sur le port 3000 et execute la fonction                               
-// "function() à chaque nouvelle connexion                                                                
-app.listen(3000, function() {                                                                             
-    console.log("Accepting HTTP request on port 3000");                                                   
-});     
+// Importe le module chance
+var Chance = require('chance');
+var chance = new Chance();
+
+// Importe le module express
+var express = require('express');
+var app = new express();
+
+// Importe le module random-words-slugs
+var randomWords = require('random-word-slugs');
+
+// execute le code à chaque requête "GET /"
+app.get('/', function(req, res) {
+    console.log("GET / received");
+    res.send(generateAnimals());
+});
+
+// execute le code à chaque requête "GET /test"
+app.get('/test', function(req, res) {
+    res.send("You tried to access /test.");
+});
+
+// Met l'application en mode écoute sur le port 3000 et execute la fonction
+// "function() à chaque nouvelle connexion
+app.listen(3000, function() {
+    console.log("Accepting HTTP request on port 3000");
+});
+
+// Fonction qui génère une String sous forme de liste d'animaux
+function generateAnimals() {
+    var animals = [];
+    //var animalsList = "Welcome to HEIG, these animals are currently enrolled at our school: \n";
+    var numberOfAnimals = chance.integer({
+        min: 5,
+        max: 10
+    });
+    console.log(numberOfAnimals);
+    for(var i = 0; i < numberOfAnimals; ++i) {
+        var gender = chance.gender();
+        var species = chance.animal();
+        var birthYear = chance.year({
+            min: 1800,
+            max: 2021,
+        });
+        var firstName = chance.first({ gender: gender });
+        var lastName = chance.last();
+        var word = randomWords.generateSlug(4, {format: "title" });
+
+        animals.push({
+            firstname: firstName,
+            lastname: lastName,
+            gend: gender,
+            specie: species,
+            birthyear: birthYear,
+            favouriteWords: word
+        });
+    };
+    console.log(animals);
+    return animals;
+}
+
 ```
 
 Puis tester en lancant
@@ -278,10 +330,11 @@ Et entrer:
 GET /api/animals/HTTP/1.1
 Host: revprox
 ```
-## Démo
 
 # Etape 4
-
+## Description
+Implémenter des requêtes Ajax avec Jquery dans notre site de contenu 
+statiques pour aller récupérer du contenu dynamique sur notre serveur express.
 ## Marche à suivre
 
 Mettre à jours le fichier Dockerfile des étapes 1 et 2 afin d'installer
@@ -363,6 +416,8 @@ localhost:8080 et constater la page se mettre à jour toutes les 5 secondes.
 ```
 
 Résultat: 
+Le champ en dessous du titre "API" est mis à jour toutes les 5 secondes avec 
+un contenu aléatoire récupéré depuis notre serveur express.
 
 ![img.png](figures/img.png)
 
@@ -373,8 +428,11 @@ Notre démo ne fonctionnerait pas sans un reverse proxy à cause du mécanisme
 de sécurité "same-origin" qui empêche de charger des scripts qui ne 
 proviennent pas de la même origine que la page.
 
-
 # Etape 5
+## Description
+Implémenter un reverse proxy donc le fichier de configuration VirtualHost 
+est généré dynamiquement en récupérant les adresses IP depuis les variables 
+d'environnement passées en paramètre lors du lancement du container docker.
 
 ## Marche à suivre
 Tout d'abord, nous avons modifié notre fichier Dockerfile du reverse proxy
@@ -435,7 +493,7 @@ done
 exec apache2 -DFOREGROUND "$@"
 ```
 
-Ensuite, nous avons créer un dossier "templates", puis un fichier
+Ensuite, nous avons créé un dossier "templates", puis un fichier
 "config-template.php" dans ce dossier. Ce fichier contient le code
 suivant:
 ```
@@ -457,18 +515,24 @@ suivant:
 </VirtualHost>
 ```
 
-Rajouter cette ligne dans dans le fichier "apache2-foreground":
+Rajouter cette ligne dans le fichier "apache2-foreground" :
 ```
 php /var/apache2/templates/config-template.php > /etc/apache2/sites-available/001-reverse-proxy.conf
 ```
 
-Procédure:
+### Procédure
 ```
-sudo docker run -d -e STATIC_APP=172.17.0.2:80 -e DYNAMIC_APP=172.17.0.3:3000 -p
- 8080:80 api/dynrp
+sudo docker run -d -e STATIC_APP=172.17.0.2:80 -e DYNAMIC_APP=172.17.0.3:3000 -p 8080:80 api/dynrp
 ```
 
 # Etape 6 - Load Balancer
+## Description
+Implémenter un système de load balancing pour que la charge de traffic soit 
+partagée entre les différents serveurs.
+
+## Implémentation
+Nous avons utilisé les capacités d'Apache pour réaliser le load balancing en 
+grâce à une configuration du fichier VirtualHost.
 
 ## Marche à suivre
 Nous avons décidé de ne pas implémenter les adresses ip dynamique pour
@@ -515,10 +579,16 @@ On peut aussi arrêter l'un des serveurs de chaque groupe et voir
 que le site est toujours affiché et que les requêtes dynamiques 
 continue à recevoir des réponses.
 
-## Avec traefik
-
-
 # Etape 7 - round-robin vs sticky sessions
+## Description
+Implémenter la fonctionnalité sticky session qui permet d'assigner une 
+session à un serveur afin que ce soit toujours le même serveur qui réponde 
+aux requêtes d'une même session.
+
+## Implémentation
+Nous avons utilisé la configuration du fichier VirtualHost d'Apache ainsi 
+que le module Headers pour implémenter cette fonctionnalité.
+
 ## Marche à suivre
 Tout d'abord, il faut ajouter le module "headers" aux modules chargés dans le
 Dockerfile du reverse proxy.
@@ -560,9 +630,9 @@ session sur le même serveur.
 Pour tester le bon fonctionnement de la procédure, nous avons vérifié
 les cookies dans le navigateur ainsi que regardé les logs de nos containers
 afin de savoir quel serveur répondait à quel moment. Nous pouvons confirmer que 
-les sticky sessions sont correctement implémentées car en vérifiant les logs 
+les sticky sessions sont correctement implémentées, car en vérifiant les logs 
 des serveurs, nous constatons que c'est toujours le même serveur qui réponds aux 
-requêtes pour la même session. Du coté client, nous pouvons confirmer que les 
+requêtes pour la même session. Du côté client, nous pouvons confirmer que les 
 cookies sont correctement créés avec un paramètre ROUTEID comme le montre la 
 capture d'écran ci-dessous de deux navigateurs différents qui obtient un 
 ROUTEID différent.
@@ -577,6 +647,11 @@ accessibles automatiquement, le tout pouvant être surveillé et géré depuis
 une interface web.
 
 ## Implémentation
+
+Note: En implémentant Traefik, nous avons réalisé sa simplicité pour implémenter
+plusieurs des étapes précédentes avec quelques paramètres de configuration
+uniquement. Cette étape implémente donc plusieurs fonctionnalité en même temps.
+
 Nous avons utilisé Docker-Compose, Traefik et Portainer pour implémenter cette 
 solution. Docker-compose nous permet de configurer tous nos containers dans 
 un fichier et de les lancer. Traefik permet agit comme un 
