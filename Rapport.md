@@ -569,8 +569,6 @@ ROUTEID différent.
 
 ![](figures/sticky.jpg)
 
-## Avec traefik
-
 # Etape 8 Management UI - Load Balancing, Dynamic cluster management & Management Ui
 ## Description
 Implémenter une solution avec load balancing et gestion dynamique de 
@@ -581,12 +579,22 @@ une interface web.
 ## Implémentation
 Nous avons utilisé Docker-Compose, Traefik et Portainer pour implémenter cette 
 solution. Docker-compose nous permet de configurer tous nos containers dans 
-un fichier et de les lancer. Traefik permet de gérer le load-balancing et 
-Portainer permet de gérer les containers depuis une interface web.
+un fichier et de les lancer. Traefik permet agit comme un 
+reverse proxy et gère le load-balancing et 
+les sticky session et Portainer permet de gérer les containers depuis une 
+interface web. Nous avons mis 2 instances du serveur à contenu statique et 2 
+instances du serveur à contenu dynamique, mais cela peut être modifié en tout 
+temps dans le fichier docker-compose.
+
+Traefik route dynamiquement et automatiquement les requêtes vers les diverses 
+instances du même service. Si une instance est arrêtée, les requêtes sont automatiquement 
+redirigées vers une autre instance disponible. Le load balancing est 
+également réalisé automatiquement.
 
 ## Marche à suivre
 
-Créer un fichier docker-compose.yml
+Depuis le dossier Step8-Traefik, créer un fichier docker-compose.yml avec le 
+contenu suivant :
 ```
 version: '3'
 services:
@@ -597,7 +605,6 @@ services:
     command: --api.insecure=true --providers.docker
     ports:
       # The HTTP port
-      #- "8282:80"
       - "${FRONT_HTTP_PORT:-8282}:80"
       # The Web UI (enabled by --api.insecure=true)
       - "8080:8080"
@@ -611,23 +618,35 @@ services:
       - TRAEFIK_ENTRYPOINTS_FRONT=true
       - TRAEFIK_ENTRYPOINTS_FRONT_ADDRESS=:${FRONT_HTTP_PORT:-80}
 
+
+  # This is our static website with a bootstrap template and making ajax
+  # jqueries to our dynamic server
   ajax:
-    # Static Content
     build: ../Step4-AjaxJQery/docker-images/ajax-query/.
     image: api/ajax
     deploy:
       replicas: 2
     labels:
+    # Theses containers will be accessible from localhost:8282/ with stick
+    # session enabled
      - "traefik.enable=true"
      - "traefik.http.routers.ajax.rule=PathPrefix(`/`)"
+     - "traefik.http.services.ajax.loadbalancer.sticky=true"
+     - "traefik.http.services.ajax.loadbalancer.sticky.cookie.name=StickyCookie"
 
+
+  # This is our dynamic server delivering a JSON table containing random
+  # content (names and animals species with birthdates, etc) on port 3000
+  # every time a request is made
   express:
-    # Dynamic Content
     build: ../Step2-Dynamic-HTTP/docker-images/express-image/.
     image: api/express
     deploy:
       replicas: 2
     labels:
+    # Theses containers will be accessible from localhost:8282/api/animals/
+    # and Traefik will redirect the requests to the port 3000 and replace
+    # "/api/animals/" by "/"
       - "traefik.enable=true"
       - "traefik.http.services.express.loadbalancer.server.port=3000"
       - "traefik.http.routers.express.rule=PathPrefix(`/api/animals/`)"
@@ -641,6 +660,7 @@ services:
       - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
 ```
 
 Puis lancer les containers avec la commande
@@ -648,3 +668,18 @@ Puis lancer les containers avec la commande
 ```
 sudo docker-compose --compatibility up -d
 ```
+
+Cela va construire, configurer et lancer les services suivants :
+
+| Service           | Description            | adresse                     |
+|-------------------|------------------------|-----------------------------|
+| Traefik           | Monitoring             | localhost:8080              |
+| Portainer         | Gestion containers     | localhost:9000              |
+| Serveur HTTP      | Contenu HTML statique  | localhost:8282              |
+| Serveur HTTP      | Contenu dynamique JSON | localhost:8282/api/animals/ |
+
+Traefik
+![](figures/traefik.png)
+
+Portainer
+![](figures/portainer.png)
