@@ -776,6 +776,7 @@ services:
   ajax:
     build: ../Step4-AjaxJQery/docker-images/ajax-query/.
     image: api/ajax
+    # Will launch 2 instances of this image
     deploy:
       replicas: 2
     labels:
@@ -793,6 +794,7 @@ services:
   express:
     build: ../Step2-Dynamic-HTTP/docker-images/express-image/.
     image: api/express
+    # Will launch 2 instances of this image
     deploy:
       replicas: 2
     labels:
