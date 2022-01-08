@@ -8,48 +8,60 @@ Mehdi Salhi
 Implémenter un serveur http dockerisé délivrant du contenu statique.
 
 ## Choix d'implémentation
-Nous avons implémenté un serveur http Apache2 servant un site à contenu 
+Nous avons implémenté un serveur http Apache servant un site à contenu 
 statique utilisant un modèle Bootstrap, le tout dans un container docker.
 
 ## Marche à suivre
 
-Créer un fichier Dockerfile avec le contenu suivant: 
+- Créer un fichier Dockerfile avec le contenu suivant: 
 
 ```
 FROM php:7.2-apache
 COPY src/ /var/www/html/
 ```
 
-Cela va permettre de créer un container docker à partir de l'image *php:7.2-apache*
+Cela va permettre de créer un container docker à partir de l'image *php:7.
+2-apache*, qui sera automatiquement téléchargée depuis le site hub.docker.com,
 tout en copiant le contenu de notre répertoire *src/* local vers le répertoire
-*/var/www/html/* du container docker.
+*/var/www/html/* du container docker. Cela permet donc d'ajouter du contenu 
+dans le dossier src/ et ce dernier sera copié et disponible dans le 
+l'image docker après chaque build.
 
-Créer un répertoire src au même niveau que le Dockerfile. Puis construire et 
-lancer l'image docker à l'aide des commandes suivantes:
+- Créer un répertoire src au même niveau que le Dockerfile. Puis construire et 
+lancer l'image docker à l'aide des commandes suivantes :
 ```
 sudo docker build -t my-php-app .
 sudo docker run -d -p 8080:80 my-php-app 
 ```
 *Noter l'utilisation du `-p` qui va mapper le port 80 de notre serveur apache
 au port 8080 de notre service docker. Le serveur dockerisé sera donc 
-accessible depuis la machine hôte via l'adresse localhost:8080.
+accessible depuis la machine hôte via l'adresse localhost:8080. Docker se 
+chargera ensuite de redirier les requêtes arrivant à cette adresse, vers le 
+port 80 du serveur dockerisé.
 
-Se connecter à un terminal dans le container que l'on vient d'exécuter:
+- Se connecter à un terminal dans le container que l'on vient d'exécuter :
 
 ```
-sudo docker exec -it my-running-app2 /bin/bash
+sudo docker exec -it my-running-app /bin/bash
 ```
-On peut ensuite explorer l'arborescence à l'aide des commandes
+*Note : "my-running-app" est le nom du container docker en cours d'execution 
+ (pas de l'image). Il est différent à chaque execution, à moins de l'avoir 
+ précisé lors de la command run avec l'argument **--name 
+ "running-app-name"**. Pour obtenir le nom d'un container en cours 
+d'execution, utiliser la commande **docker ps**.
+
+- On peut ensuite explorer l'arborescence à l'aide des commandes
 classique (ls, cd, etc, ...)
 
-Créer un fichier "index.html" dans le répertoire src créé précédemment. Ce
+- Créer un fichier "index.html" dans le répertoire src créé précédemment. Ce
 fichier servira de page d'accueil pour notre serveur http Apache.
 Dans notre cas, nous avons inclus un modèle bootstrap déjà fait afin d'avoir une
 présentation plus élégante qu'un simple titre sur fond blanc.
 
 ## Démo et procédure pas à pas
 ### Construction de l'image
-Depuis le répértoire contenant le Dockerfile:
+Depuis le répértoire contenant le Dockerfile (dans notre cas 
+"Step1-Apache_Static/docker-images/apache-php-image/") :
 ```
 sudo docker build -t my-php-app .
 ```
@@ -57,6 +69,11 @@ sudo docker build -t my-php-app .
 ```
 sudo docker run -d -p 8080:80 my-php-app 
 ```
+
+## Documentation configuration
+| Type                   | Description           | Adresse        |
+|------------------------|-----------------------|----------------|
+| Serveur HTTP dockerisé | serveur http statique | localhost:8080 |
 
 ### Accès au contenu depuis un navigateur
 Se rendre à l'adresse *localhost:8080*. 
@@ -80,17 +97,15 @@ Exemple :
 
 ## Marche à suivre
 
-Créer un fichier Dockerfile ainsi qu'un répertoire *src*
+- Créer un fichier Dockerfile ainsi qu'un répertoire *src*
 dans ce dossier.
 
 Pour choisir l'image de node.js à installer, nous avons cherché sur 
 `node.js.org` la dernière version stable de node. En l'occurrence, il 
-s'agissait de la version 16.13.1.
+s'agissait de la version 16.13.1. Nous avons donc utilisé une image de la version 16.13.1-alpine.
 
-Nous avons donc utilisé une image de la version 16.13.1-alpine.
-
-Créer un *package.json*dans le répertoire *src"
-à l'aide de la commande suivante :
+- Créer un *package.json*dans le répertoire *src" à l'aide de la commande 
+suivante :
 ```
 npm init
 ```
@@ -104,7 +119,7 @@ npm install --save chance
 npm install --save random-word-slugs
 ```
 
-Créer un fichier *index.js*, qui contiendra le script js voulu.
+- Créer un fichier *index.js*, qui contiendra le script js voulu.
 
 Dans ce fichier, nous avons entré les instructions suivantes :
 ```
@@ -121,11 +136,12 @@ for(var i = 0; i < 10; ++i) {
 
 ```
 ### Express
-Aller dans le répertoire src/ puis
+- Aller dans le répertoire src/ puis
 ```
 npm install --save express
 ```
-Modifier le fichier index.js
+
+- Modifier le fichier index.js
 
 ```
 // Importe le module chance
@@ -190,20 +206,38 @@ function generateAnimals() {
 }
 
 ```
+Description du script : Ce script se met en écoute sur le port 3000 et 
+execute une fonction à chaque requête reçue." Un aiguillage est réalisé en 
+fonction du contenu de la requête GET reçue. Si un "**GET /**" est reçu, 
+c'est la fonction **generateAnimals()** qui est exécutée et si c'est un 
+"**GET /test**", un simple texte est renvoyé.
 
-Puis tester en lancant
+La fonction **generateAnimals()** génère un objet JSON sous forme de tableau 
+contenant des prénoms, nom, genre, espèce, année de naissance, espèce et 
+mots favoris. Ce contenu est généré aléatoirement à chaque fois et il y a 
+en 5 et 10 entrées générées.
+
+- Puis tester en lancant
 ```
 node index.js
 ```
-Puis executer la commande suivante depuis un terminal, réaliser une requête 
-"GET / HTTP/1.1" et "GET /test HTTP/1.1" et observer le résultat coté serveur.
-
-On constate que ce script permet de réaliser un aiguillage en fonction de la 
-requête du client afin de lui renvoyer le contenu désiré.
-
-```
+- Puis exécuter la commande suivante depuis un terminal, réaliser les requêtes
+suivantes :
+ 
+ ```
 telnet localhost 3000
-```
+GET / HTTP/1.1 
+Host: localhost
+ ```
+
+ ```
+telnet localhost 3000
+GET /test HTTP/1.1
+Host: localhost
+ ```
+
+On constate le bon fonctionnement coté client en recevant l'objet JSON, et 
+coté serveur en voyant le contenu généré dans les logs.
 
 On peut construire l'image docker, la lancer, puis inspecter son 
 adresse ip à l'aide des commandes suivantes
@@ -217,7 +251,7 @@ sudo docker inspect express_dynamic | grep IPAddress
 
 On peut ensuite se connecter au container docker à l'aide de telnet et
 de l'adresse ip récupérée au point précédent et le port renseigner dans le
-fichier "index.js":
+fichier "index.js" :
 ```
 telnet 172.17.0.2 3000
 ```
@@ -230,43 +264,68 @@ sudo docker run -p 8080:3000 api/express
 ```
 
 Pour obtenir le même comportement que précédemment, il suffit alors d'utiliser
-la commande suivante:
+la commande suivante :
+
 ```
 telnet localhost 8080
+GET / HTTP/1.1 
+Host: localhost
 ```
+
+## Documentation configuration
+| Type                  | Description                   | Adresse        |
+|-----------------------|-------------------------------|----------------|
+| Script js serveur web | Serveur web node.js           | localhost:3000 |
+| Serveur web dockerisé | Serveur web node.js dockerisé | localhost:8080 |
 
 # Etape 3 - Reverse proxy avec Apache
 ## Description
-Implémenter un reverse proxy avec apache.
+Implémenter un reverse proxy avec apache. Le but est d'avoir un serveur 
+intermédaire entre "l'extérieur" et notre infrastructure. Cette architecture 
+à plusieurs buts et offre de nouvelles possibilités :
+- Aiguiller les requêtes, en fonction de leurs contenus, vers le bon serveur.
+Il est possible de rediriger les requêtes en fonction du protocole, du  chemin, etc
+- Dissimuler l'architecture de l'infrastructure interne. Depuis l'extérieur, 
+uniquement le reverse proxy est visible et il est donc possible de 
+mieux protéger l'infrastructure interne et de concentrer la sécurité sur le 
+proxy.
+- Contrôler et améliorer les performances, par exemple avec du load balancing
+- Implémenter des fonctionnalités telles que les sticky sessions
 
 ## Marche à suivre
 Commencer par construire et lancer les deux images créées aux 
 étapes 1 et 2 sans les mapper.
 
-Inspecter les deux container afin de récupérer leurs adresses ip respectives.
+Inspecter les deux containers afin de récupérer leurs adresses ip respectives.
 Comme nous utilisons un système linux, on peut se connecter aux deux containers
 directement avec la commande telnet en utilisant les adresses ip respectives
 et les ports 80 pour le static et 3000 pour le dynamic.
 
-Créer un dossier nommé "docker-images" et créer un fichier Dockerfile à l'intérieur.
+- Créer un dossier nommé "docker-images" et créer un fichier Dockerfile à 
+ l'intérieur. 
 Dans le Dockerfile, écrire:
 ```
 FROM php:7.2-apache
 COPY conf/ /etc/apache2
 
+# Enables the apache modules "proxy" and "proxy_http" required to use apache 
+# as a reverse proxy
 RUN a2enmod proxy proxy_http
+
+# Enables the website with the configuration files 000-* and 001-*
 RUN a2ensite 000-* 001-*
 ```
 
-Créer un dossier nommé "conf". Dans ce dossier, créer un dossier nommé
+
+- Créer un dossier nommé "conf". Dans ce dossier, créer un dossier nommé
 site-available.
-Dans ce dernier dossier, créer deux fichier nommés respectivement 
+Dans ce dernier dossier, créer deux fichiers nommés respectivement 
 "000-default.conf" et "001-reverse-proxy.conf".
 
 Dans le fichier "001-reverse-proxy.conf", écrire:
 ```
 <VirtualHost *:80>
-    ServerName revprox
+    ServerName localhost
 
     ProxyPass "/api/animals/" "http://172.17.0.2:3000/"
     ProxyPassReverse "/api/animals/" "http://172.17.0.2:3000/"
@@ -277,6 +336,9 @@ Dans le fichier "001-reverse-proxy.conf", écrire:
 
 </VirtualHost>
 ```
+Description : redirige les requêtes en fonction de leur chemin vers le bon 
+serveur
+
 Dans le fichier "000-default.conf", simplement écrire:
 
 ```
@@ -292,6 +354,7 @@ soit la configuration par défaut, qui renvoie un message d'erreur, soit
 la configuration "reverse-proxy" qui va nous rediriger sur l'un ou l'autre de
 nos container non mappés.
 
+### Demo et procédure pas à pas
 ```
 Depuis le repertoire contenant le Dockerfile du site statique, construire puis 
 lancer l'image
@@ -321,35 +384,23 @@ Puis se connecter au serveur:
 telnet localhost 8080
 Et entrer:
 GET / HTTP/1.1
-Host: revprox
+Host: localhost
 
 Puis constater la redirection vers le site bootstrap
 Réeffectuer une connexion pour tester la redirection vers le site express.js
 telnel localhost 8080
 Et entrer:
 GET /api/animals/HTTP/1.1
-Host: revprox
+Host: localhost
 ```
 
-# Etape 4
+# Etape 4 - Requêtes AJAX avec JQuery
 ## Description
 Implémenter des requêtes Ajax avec Jquery dans notre site de contenu 
 statiques pour aller récupérer du contenu dynamique sur notre serveur express.
 ## Marche à suivre
 
-Mettre à jours le fichier Dockerfile des étapes 1 et 2 afin d'installer
-vim dans chacune de ces deux images. Pour cela, rajouter cette commande:
-```
-RUN apt-get update && \
-    apt-get install -y vim
-```
-
-Note:
-Afin de pouvoir nous connecter au reverse proxy sans résoudre de nom DNS,
-nous avons édité notre fichier "001-reverse-proxy.conf" en lui renseignant 
-"localhost" comme nom d'hôte.
-
-Editer le fichier "index.html" créé au point 1 afin d'y rajouter un script
+Éditer le fichier "index.html" créé au point 1 afin d'y rajouter un script
 js juste avant la balise fermante du body, ainsi que la librairie jquery.
 ```
     <!-- jQuery -->
@@ -399,6 +450,7 @@ $(function() {
 La ligne **$(".mySuperClass").html(message);** permet de mettre à jour 
 les éléments qui font partie de la classe "**mySuperClass**".
 
+### Demo et procédure pas à pas
 Construire et lancer les containers Docker
 ```
 Depuis les repertoires associés aux containers voulus:
@@ -415,7 +467,7 @@ Puis accéder au reverse proxy depuis un navigateur avec l'adresse
 localhost:8080 et constater la page se mettre à jour toutes les 5 secondes.
 ```
 
-Résultat: 
+Résultats : 
 Le champ en dessous du titre "API" est mis à jour toutes les 5 secondes avec 
 un contenu aléatoire récupéré depuis notre serveur express.
 
@@ -428,22 +480,23 @@ Notre démo ne fonctionnerait pas sans un reverse proxy à cause du mécanisme
 de sécurité "same-origin" qui empêche de charger des scripts qui ne 
 proviennent pas de la même origine que la page.
 
-# Etape 5
+# Etape 5 - Configuration dynamique du reverse proxy
 ## Description
-Implémenter un reverse proxy donc le fichier de configuration VirtualHost 
+Implémenter un reverse proxy dont le fichier de configuration VirtualHost 
 est généré dynamiquement en récupérant les adresses IP depuis les variables 
 d'environnement passées en paramètre lors du lancement du container docker.
 
 ## Marche à suivre
 Tout d'abord, nous avons modifié notre fichier Dockerfile du reverse proxy
-en y ajoutant ces lignes:
+en y ajoutant ces lignes :
+
 ```
 COPY apache2-foreground /usr/local/bin/
 RUN chmod +x /usr/local/bin/apache2-foreground
 ```
 
-Ensuite, nous avons créer un fichier "apache2-foreground" au même
-niveau que le Dockerfile en y incluant ce code:
+Ensuite, nous avons créé un fichier "apache2-foreground" au même
+niveau que le Dockerfile en y incluant ce code :
 ```
 #!/bin/bash
 set -e
@@ -495,7 +548,7 @@ exec apache2 -DFOREGROUND "$@"
 
 Ensuite, nous avons créé un dossier "templates", puis un fichier
 "config-template.php" dans ce dossier. Ce fichier contient le code
-suivant:
+suivant :
 ```
 <?php
     $dynamic_app = getenv('DYNAMIC_APP');
@@ -520,10 +573,20 @@ Rajouter cette ligne dans le fichier "apache2-foreground" :
 php /var/apache2/templates/config-template.php > /etc/apache2/sites-available/001-reverse-proxy.conf
 ```
 
+Cette configuration sert à générer dynamiquement un fichier de configuration 
+apache en fonction des variables d'environnement. Ces variables seront 
+passées en paramètre lors du lancement du container docker.
+
 ### Procédure
+Lancer le container docker avec les variables d'environnement contenant les 
+bonnes adresses IP des serveurs statiques et dynamiques.
 ```
 sudo docker run -d -e STATIC_APP=172.17.0.2:80 -e DYNAMIC_APP=172.17.0.3:3000 -p 8080:80 api/dynrp
 ```
+
+On peut ensuite constater le bon fonctionnement soit en allant inspecter le 
+contenu du fichier "001-reverse-proxy.conf" dans le reverse proxy, soit en se 
+connectant à "localhost:8080" pour constater le bon fonctionnement du proxy.
 
 # Etape 6 - Load Balancer
 ## Description
@@ -531,17 +594,20 @@ Implémenter un système de load balancing pour que la charge de traffic soit
 partagée entre les différents serveurs.
 
 ## Implémentation
-Nous avons utilisé les capacités d'Apache pour réaliser le load balancing en 
+Nous avons utilisé les capacités d'Apache pour réaliser le load balancing 
 grâce à une configuration du fichier VirtualHost.
 
 ## Marche à suivre
 Nous avons décidé de ne pas implémenter les adresses ip dynamique pour
 cette étape, car nous lançons plusieurs containers et ne voulons pas devoir
-passer 5 ou plus adresses ip en paramètre à chaque fois.
+passer 5 ou plus adresses ip en paramètre à chaque fois. 
+
+*Note: Nous avons également implémenté le load balancing avec Traefik à l'étape 
+8, mais cette fois de manière dynamique.
 
 Afin de mettre en place le load balancing, il suffit de définir des 
 "proxy balancer" dans le fichier "001-reverse-proxy.conf" afin de 
-renseigner les différent serveurs disponible au balancing pour une url.
+renseigner les différents serveurs disponibles au balancing pour une url.
 ```
 <VirtualHost *:80>
     ServerName localhost
@@ -566,6 +632,14 @@ renseigner les différent serveurs disponible au balancing pour une url.
 
 </VirtualHost>
 ```
+Description: Chaque "chemin" par lequel est accedé le proxy dispose d'un 
+pool de serveur disponibles qui répondront aux requêtes. L'algorithme de 
+load balacing se chargera de répartir les requêtes aux différents serveurs 
+en fonction de différents critères tels que le nombre de requête, la charge 
+de travail, les IP, etc. Par simplicité nous avons utilisé 
+l'algorithme byrequest qui répartit les requêtes entre les serveurs. Il est 
+possible d'affiner la configuration en donnant un poids plus important à 
+certains serveurs par exemple.
 
 Les adresses ip sont évidemment à changer en fonction de la configuration
 des différents containers.
