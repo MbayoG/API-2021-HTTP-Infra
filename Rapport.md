@@ -653,7 +653,7 @@ On peut aussi arrêter l'un des serveurs de chaque groupe et voir
 que le site est toujours affiché et que les requêtes dynamiques 
 continue à recevoir des réponses.
 
-# Etape 7 - round-robin vs sticky sessions
+# Étape 7 - round-robin vs sticky sessions
 ## Description
 Implémenter la fonctionnalité sticky session qui permet d'assigner une 
 session à un serveur afin que ce soit toujours le même serveur qui réponde 
@@ -708,7 +708,7 @@ les sticky sessions sont correctement implémentées, car en vérifiant les logs
 des serveurs, nous constatons que c'est toujours le même serveur qui réponds aux 
 requêtes pour la même session. Du côté client, nous pouvons confirmer que les 
 cookies sont correctement créés avec un paramètre ROUTEID comme le montre la 
-capture d'écran ci-dessous de deux navigateurs différents qui obtient un 
+capture d'écran ci-dessous de deux navigateurs différents qui obtiennent un 
 ROUTEID différent.
 
 ![](figures/sticky.jpg)
@@ -724,11 +724,11 @@ une interface web.
 
 Note: En implémentant Traefik, nous avons réalisé sa simplicité pour implémenter
 plusieurs des étapes précédentes avec quelques paramètres de configuration
-uniquement. Cette étape implémente donc plusieurs fonctionnalité en même temps.
+uniquement. Cette étape implémente donc plusieurs fonctionnalités en même temps.
 
 Nous avons utilisé Docker-Compose, Traefik et Portainer pour implémenter cette 
 solution. Docker-compose nous permet de configurer tous nos containers dans 
-un fichier et de les lancer. Traefik permet agit comme un 
+un fichier et de les lancer. Traefik agit comme un 
 reverse proxy et gère le load-balancing et 
 les sticky session et Portainer permet de gérer les containers depuis une 
 interface web. Nous avons mis 2 instances du serveur à contenu statique et 2 
@@ -739,6 +739,9 @@ Traefik route dynamiquement et automatiquement les requêtes vers les diverses
 instances du même service. Si une instance est arrêtée, les requêtes sont automatiquement 
 redirigées vers une autre instance disponible. Le load balancing est 
 également réalisé automatiquement.
+
+Portainer permet de stopper ou redémarrer des containers et même un "stack" 
+complet (ensemble de serveurs).
 
 ## Marche à suivre
 
@@ -776,7 +779,7 @@ services:
     deploy:
       replicas: 2
     labels:
-    # Theses containers will be accessible from localhost:8282/ with stick
+    # Theses containers will be accessible from localhost:8282/ with sticky
     # session enabled
      - "traefik.enable=true"
      - "traefik.http.routers.ajax.rule=PathPrefix(`/`)"
@@ -803,7 +806,7 @@ services:
       - "traefik.http.middlewares.express-replacepath.replacepath.path=/"
 
   portainer:
-    # Portainer management UIdocker-images/ajax-query/.
+    # Portainer management UI
     image: portainer/portainer-ce
     ports:
       - "9000:9000"
@@ -811,6 +814,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
 ```
+*Note : nous avons documenté le script directement dans les commentaires.
 
 Puis lancer les containers avec la commande
 

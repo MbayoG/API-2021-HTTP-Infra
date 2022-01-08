@@ -56,7 +56,7 @@ services:
       - "traefik.http.middlewares.express-replacepath.replacepath.path=/"
 
   portainer:
-    # Portainer management UIdocker-images/ajax-query/.
+    # Portainer management UI
     image: portainer/portainer-ce
     ports:
       - "9000:9000"
