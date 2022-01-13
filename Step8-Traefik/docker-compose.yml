@@ -7,19 +7,12 @@ services:
     command: --api.insecure=true --providers.docker
     ports:
       # The HTTP port
-      - "${FRONT_HTTP_PORT:-8282}:80"
+      - "8282:80"
       # The Web UI (enabled by --api.insecure=true)
       - "8080:8080"
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
-
-    environment:
-      - TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
-      - TRAEFIK_PROVIDERS_DOCKER=true
-      - TRAEFIK_ENTRYPOINTS_FRONT=true
-      - TRAEFIK_ENTRYPOINTS_FRONT_ADDRESS=:${FRONT_HTTP_PORT:-80}
-
 
   # This is our static website with a bootstrap template and making ajax
   # jqueries to our dynamic server
