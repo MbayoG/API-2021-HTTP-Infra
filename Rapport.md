@@ -821,7 +821,7 @@ services:
 Puis lancer les containers avec la commande
 
 ```
-sudo docker-compose --compatibility up -d
+sudo docker-compose --compatibility up -d --build
 ```
 
 Cela va construire, configurer et lancer les services suivants :
