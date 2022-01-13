@@ -826,13 +826,17 @@ sudo docker-compose --compatibility up -d --build
 
 Cela va construire, configurer et lancer les services suivants :
 
-| Service           | Description            | adresse                     |
-|-------------------|------------------------|-----------------------------|
-| Traefik           | Monitoring             | localhost:8080              |
-| Portainer         | Gestion containers     | localhost:9000              |
-| Serveur HTTP      | Contenu HTML statique  | localhost:8282              |
-| Serveur HTTP      | Contenu dynamique JSON | localhost:8282/api/animals/ |
+| Service      | Description            | adresse                     |
+|--------------|------------------------|-----------------------------|
+| Traefik      | Monitoring             | localhost:8080              |
+| Portainer*   | Gestion containers     | localhost:9000              |
+| Serveur HTTP | Contenu HTML statique  | localhost:8282              |
+| Serveur HTTP | Contenu dynamique JSON | localhost:8282/api/animals/ |
 
+Note* : Nous n'avons pas inclus de stockage permanant dans notre container 
+Portainer et il faut donc redéfinir un mot de passe à chaque lancement du 
+container pour accéder à l'interface de gestion. Sinon il faudrait mapper un 
+volume.
 Traefik
 ![](figures/traefik.png)
 
